@@ -4,14 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src",
+    "test": "nodemon --watch src/ src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "eslint-config-prettier": "^8.3.0",
-    "koa": "^2.13.4"
+    "koa": "^2.13.4",
+    "koa-router": "^10.1.1",
+    "nodemon": "^2.0.14"
   },
   "devDependencies": {
     "eslint": "^8.1.0"

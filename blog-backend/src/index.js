@@ -1,27 +1,25 @@
 const Koa = require('koa');
+const Rounter = require('koa-router');
 
 const app = new Koa();
+const rounter = new Rounter();
 
-app.use((ctx, next) => {
-  console.log(ctx.url);
-  console.log(1);
-  if (ctx.query.authorized !== '1') {
-    ctx.status = 401;
-    return;
-  }
-  next().then(() => {
-    console.log('END');
-  });
+// 라우터 설정
+
+/**
+ * @param1    경로
+ * @param2    라우터에 적용할 미들웨어 함수
+ */
+rounter.get('/', (ctx) => {
+  ctx.body = '홈';
 });
 
-app.use((ctx, next) => {
-  console.log(2);
-  next();
+rounter.get('/about', (ctx) => {
+  ctx.body = '소개';
 });
 
-app.use((ctx) => {
-  ctx.body = 'hello world';
-});
+// app 인스턴스에 라우터 적용
+app.use(rounter.routes()).use(rounter.allowedMethods());
 
 app.listen(4000, () => {
   console.log('Listening to port 4000');
