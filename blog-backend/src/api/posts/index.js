@@ -1,4 +1,6 @@
 const Rounter = require('koa-router');
+const postsCtrl = require('./posts.ctrl');
+
 const posts = new Rounter();
 
 const printinfo = (ctx) => {
@@ -9,11 +11,11 @@ const printinfo = (ctx) => {
   };
 };
 
-posts.get('/', printinfo);
-posts.post('/', printinfo);
-posts.get('/:id', printinfo);
-posts.delete('/:id', printinfo);
-posts.put('/:id', printinfo);
-posts.patch('/:id', printinfo);
+posts.get('/', postsCtrl.list);
+posts.post('/', postsCtrl.write);
+posts.get('/:id', postsCtrl.read);
+posts.delete('/:id', postsCtrl.remove);
+posts.put('/:id', postsCtrl.replace);
+posts.patch('/:id', postsCtrl.update);
 
 module.exports = posts;
