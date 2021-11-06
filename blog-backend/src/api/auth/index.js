@@ -8,4 +8,4 @@ auth.post('/login', authCtrl.login);
 auth.post('/check', authCtrl.check);
 auth.post('/logout', authCtrl.logout);
 
-export default auth;
+module.exports = auth;
