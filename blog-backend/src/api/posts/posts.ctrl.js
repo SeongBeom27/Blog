@@ -5,10 +5,31 @@ import Joi from 'joi';
 const { ObjectId } = mongoose.Types;
 
 // ObjectId 검증
-export const CheckObjectId = (ctx, next) => {
+export const getPostById = async (ctx, next) => {
   const { id } = ctx.params;
   if (!ObjectId.isValid(id)) {
     ctx.status = 400;
+    return;
+  }
+
+  try {
+    const post = await Post.findById(id);
+
+    // 포스트가 존재하지 않을 때
+    if (!post) {
+      ctx.status = 404;
+    }
+    ctx.state.post = post;
+    return next();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const checkOwnPost = (ctx, next) => {
+  const { user, post } = ctx.state;
+  if (post.user._id.toString() !== user._id) {
+    ctx.status = 403;
     return;
   }
   return next();
@@ -43,6 +64,7 @@ export const write = async (ctx) => {
     title,
     body,
     tags,
+    user: ctx.state.user,
   });
   try {
     // async/await 문법으로 데이터베이스 저장 요청을 완료할 때 까지 대기
@@ -58,7 +80,7 @@ export const write = async (ctx) => {
 
 /**
  * 포스트 목록 조회
- * GET /api/posts
+ * GET /api/posts?username=&tag=&page=
  */
 export const list = async (ctx) => {
   // query는 문자열이기 때문에 숫자로 변환 작업이 필요함
@@ -70,16 +92,23 @@ export const list = async (ctx) => {
     return;
   }
 
+  const { tag, username } = ctx.query;
+  // tag, username 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
+  const query = {
+    ...(username ? { 'user.username': username } : {}),
+    ...(tag ? { tags: tag } : {}),
+  };
+
   try {
     // find 호출 뒤 exec까지 호출해야 쿼리 요청이 된다.
     // sort : key는 정렬할 필드를 설정하는 부분이며 1이면 오름차순 -1이면 내림차순
     // limit : 한 번에 보이는 포스트의 최대 개수를 제한한다
-    const posts = await Post.find()
+    const posts = await Post.find(query)
       .sort({ _id: -1 })
       .limit(10)
       .skip((page - 1) * 10)
       .exec();
-    const postCount = await Post.countDocuments().exec();
+    const postCount = await Post.countDocuments(query).exec();
     ctx.set('Last-Page', Math.ceil(postCount / 10));
     ctx.body = posts
       .map((post) => post.toJSON())
@@ -98,17 +127,7 @@ export const list = async (ctx) => {
  * GET /api/posts/:id
  */
 export const read = async (ctx) => {
-  const { id } = ctx.params;
-  try {
-    const post = await Post.findById(id).exec();
-    if (!post) {
-      ctx.status = 404; // not found
-      return;
-    }
-    ctx.body = post;
-  } catch (e) {
-    ctx.throw(500, e);
-  }
+  ctx.body = ctx.state.post;
 };
 
 /**
