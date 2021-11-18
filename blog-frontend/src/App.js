@@ -1,10 +1,10 @@
-import React from 'react'
-import { Route } from 'react-router-dom'
-import LoginPage from './pages/LoginPage'
-import PostListPage from './pages/PostListPage'
-import PostPage from './pages/PostPage'
-import RegisterPage from './pages/RegisterPage'
-import WritePage from './pages/WritePage'
+import React from 'react';
+import { Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import PostListPage from './pages/PostListPage';
+import PostPage from './pages/PostPage';
+import RegisterPage from './pages/RegisterPage';
+import WritePage from './pages/WritePage';
 
 const App = () => {
   return (
@@ -15,7 +15,7 @@ const App = () => {
       <Route component={WritePage} path="/write"></Route>
       <Route component={PostPage} path="/@:username/:postId"></Route>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
