@@ -5,7 +5,6 @@ const PostListPage = () => {
   return (
     <>
       <HeaderContainer />
-      <div>hello</div>
     </>
   );
 };
