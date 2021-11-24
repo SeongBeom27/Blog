@@ -24,7 +24,7 @@ const WriteActionButtons = ({ onCancle, onPublish }) => {
       <StyledButton cyan onClick={onPublish}>
         포스트 등록
       </StyledButton>
-      <StyledButton onCancle={onCancle}>취소</StyledButton>
+      <StyledButton onClick={onCancle}>취소</StyledButton>
     </WriteActionButtonBlock>
   );
 };

@@ -77,11 +77,14 @@ const TagBox = () => {
   const [input, setInput] = useState('');
   const [localTags, setLocalTags] = useState([]);
 
-  const insertTag = useCallback((tag) => {
-    if (!tag) return; // 공백이라면 추가하지 않음
-    if (localTags.includes(tag)) return; // 이미 존재한다면 추가하지 않음
-    setLocalTags([...localTags, tag]);
-  });
+  const insertTag = useCallback(
+    (tag) => {
+      if (!tag) return; // 공백이라면 추가하지 않음
+      if (localTags.includes(tag)) return; // 이미 존재한다면 추가하지 않음
+      setLocalTags([...localTags, tag]);
+    },
+    [localTags],
+  );
 
   const onRemove = useCallback(
     (tag) => {
