@@ -9,7 +9,7 @@ import WritePage from './pages/WritePage';
 const App = () => {
   return (
     <div>
-      <Route component={PostListPage} path={['/@:username', '/']}></Route>
+      <Route component={PostListPage} path={['/@:username', '/']} exact />
       <Route component={LoginPage} path="/login"></Route>
       <Route component={RegisterPage} path="/register"></Route>
       <Route component={WritePage} path="/write"></Route>

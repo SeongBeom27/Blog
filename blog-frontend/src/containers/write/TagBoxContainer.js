@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React from 'react';
 import TagBox from '../../components/write/TagBox';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeField } from '../../modules/write';
