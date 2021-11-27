@@ -39,6 +39,13 @@ const PostItemBlock = styled.div`
   p {
     margin-top: 2rem;
   }
+
+  .classtitle {
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const PostItem = ({ post }) => {
@@ -47,7 +54,9 @@ const PostItem = ({ post }) => {
   return (
     <PostItemBlock>
       <h2>
-        <Link to={`/@${user.username}/${_id}`}>{title}</Link>
+        <Link className="classtitle" to={`/@${user.username}/${_id}`}>
+          {title}
+        </Link>
       </h2>
       <SubInfo
         username={user.username}

@@ -211,13 +211,14 @@ export const update = async (ctx) => {
 
   try {
     const post = await Post.findByIdAndUpdate(id, nextData, {
-      new: true, // 이 값을 설정하면 업데이트된 데이터를 반환한다.
-      // false일 때는 업데이트되기 전의 데이터를 반환한다
+      new: true, // 이 값을 설정하면 업데이트된 데이터를 반환합니다.
+      // false 일 때에는 업데이트 되기 전의 데이터를 반환합니다.
     }).exec();
     if (!post) {
       ctx.status = 404;
       return;
     }
+    ctx.body = post;
   } catch (e) {
     ctx.throw(500, e);
   }

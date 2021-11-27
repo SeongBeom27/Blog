@@ -15,3 +15,13 @@ export const listPosts = ({ page, username, tag }) => {
   // listPosts API를 호출ㄹ 때 파라미터로 값을 넣어주면 /api/posts?username=seongbeom&page=2 와 같이 주소를 만들어서 호출하게 된다
   return client.get(`/api/posts?${queryString}`);
 };
+
+export const updatePost = ({ id, title, body, tags }) => {
+  return client.patch(`/api/posts/${id}`, {
+    title,
+    body,
+    tags,
+  });
+};
+
+export const removePost = (id) => client.delete(`/api/posts/${id}`);

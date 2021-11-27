@@ -62,6 +62,15 @@ const Editor = ({ onChangeField, title, body }) => {
     });
   }, [onChangeField]);
 
+  // TODO : 이해 필요
+  // 글 수정 시 값이 초기화되어 있도록 처리해주는 코드
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+    quillInstance.current.root.innerHTML = body;
+  }, [body]);
+
   const onChangeTitle = (e) => {
     onChangeField({ key: 'title', value: e.target.value });
   };

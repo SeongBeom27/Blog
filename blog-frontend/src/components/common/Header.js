@@ -23,6 +23,10 @@ const Wrapper = styled(Responsive)`
     font-size: 1.125rem;
     font-weight: 800;
     letter-spacing: 2px;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
   }
   .right {
     display: flex;
@@ -45,7 +49,9 @@ const Header = ({ user, onLogout }) => {
     <>
       <HeaderBlock>
         <Wrapper>
-          <Link className="logo">Community</Link>
+          <Link className="logo" to="/">
+            Community
+          </Link>
           {user ? (
             <div className="right">
               <UserInfo>{user.username}</UserInfo>

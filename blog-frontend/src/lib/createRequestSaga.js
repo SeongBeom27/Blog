@@ -18,7 +18,7 @@ export default function createRequestSaga(type, request) {
       // @param1 : 함수
       // @param2 : 해당 함수에 넣을 인수
       const response = yield call(request, action.payload);
-      console.log('Server Response : ', response);
+
       // 상태에 변화를 줌
       yield put({
         type: SUCCESS,
