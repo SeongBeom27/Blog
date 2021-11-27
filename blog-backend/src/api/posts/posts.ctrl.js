@@ -1,8 +1,33 @@
 import Post from '../../models/post';
 import mongoose from 'mongoose';
 import Joi from 'joi';
+import sanitizeHtml from 'sanitize-html';
 
 const { ObjectId } = mongoose.Types;
+
+const sanitizeOption = {
+  allowedTags: [
+    'h1',
+    'h2',
+    'b',
+    'i',
+    'u',
+    's',
+    'p',
+    'ul',
+    'ol',
+    'li',
+    'blockquote',
+    'a',
+    'img',
+  ],
+  allowedAttributes: {
+    a: ['href', 'name', 'target'],
+    img: ['src'],
+    li: ['class'],
+  },
+  allowedSchemes: ['data', 'http'],
+};
 
 // ObjectId 검증
 export const getPostById = async (ctx, next) => {
@@ -62,7 +87,7 @@ export const write = async (ctx) => {
   const { title, body, tags } = ctx.request.body;
   const post = new Post({
     title,
-    body,
+    body: sanitizeHtml(body, sanitizeOption),
     tags,
     user: ctx.state.user,
   });
@@ -78,13 +103,19 @@ export const write = async (ctx) => {
   }
 };
 
-/**
- * 포스트 목록 조회
- * GET /api/posts?username=&tag=&page=
- */
+const removeHtmlAndShorten = (body) => {
+  const filtered = sanitizeHtml(body, {
+    allowedTags: [],
+  });
+  return filtered.length < 200 ? filtered : `${filtered.slice(0, 200)}...`;
+};
+
+/*
+  GET /api/posts?username=&tag=&page=
+*/
 export const list = async (ctx) => {
-  // query는 문자열이기 때문에 숫자로 변환 작업이 필요함
-  // 값이 주어지지 않았다면 1을 기본적으로 사용한다
+  // query 는 문자열이기 때문에 숫자로 변환해주어야합니다.
+  // 값이 주어지지 않았다면 1 을 기본으로 사용합니다.
   const page = parseInt(ctx.query.page || '1', 10);
 
   if (page < 1) {
@@ -100,23 +131,18 @@ export const list = async (ctx) => {
   };
 
   try {
-    // find 호출 뒤 exec까지 호출해야 쿼리 요청이 된다.
-    // sort : key는 정렬할 필드를 설정하는 부분이며 1이면 오름차순 -1이면 내림차순
-    // limit : 한 번에 보이는 포스트의 최대 개수를 제한한다
     const posts = await Post.find(query)
       .sort({ _id: -1 })
       .limit(10)
       .skip((page - 1) * 10)
+      .lean()
       .exec();
     const postCount = await Post.countDocuments(query).exec();
     ctx.set('Last-Page', Math.ceil(postCount / 10));
-    ctx.body = posts
-      .map((post) => post.toJSON())
-      .map((post) => ({
-        ...post,
-        body:
-          post.body.length < 200 ? post.body : `${post.body.slice(0, 200)}...`,
-      }));
+    ctx.body = posts.map((post) => ({
+      ...post,
+      body: removeHtmlAndShorten(post.body),
+    }));
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -162,8 +188,29 @@ export const remove = async (ctx) => {
  */
 export const update = async (ctx) => {
   const { id } = ctx.params;
+  // write 에서 사용한 schema 와 비슷한데, required() 가 없습니다.
+  const schema = Joi.object().keys({
+    title: Joi.string(),
+    body: Joi.string(),
+    tags: Joi.array().items(Joi.string()),
+  });
+
+  // 검증 후, 검증 실패시 에러처리
+  const result = schema.validate(ctx.request.body);
+  if (result.error) {
+    ctx.status = 400; // Bad Request
+    ctx.body = result.error;
+    return;
+  }
+
+  const nextData = { ...ctx.request.body }; // 객체를 복사하고
+  // body 값이 주어졌으면 HTML 필터링
+  if (nextData.body) {
+    nextData.body = sanitizeHtml(nextData.body, sanitizeOption);
+  }
+
   try {
-    const post = await Post.findByIdAndUpdate(id, ctx.request.body, {
+    const post = await Post.findByIdAndUpdate(id, nextData, {
       new: true, // 이 값을 설정하면 업데이트된 데이터를 반환한다.
       // false일 때는 업데이트되기 전의 데이터를 반환한다
     }).exec();
